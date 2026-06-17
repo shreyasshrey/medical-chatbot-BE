@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+chromadb
+langchain
+langchain_chroma
+langchain-community
+langchain-huggingface
+sentence-transformers
+transformers
+torch
+pypdf
+redis
+python-dotenv
+sse-starlette
+sqlalchemy
+pymysql
