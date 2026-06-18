@@ -36,6 +36,8 @@
 # - Persistence
 # - Metadata support
 #
+from pathlib import Path
+
 from langchain_chroma import Chroma
 
 # Import embedding model
@@ -79,23 +81,25 @@ from app.core.config import CHROMA_DIR
 # Chroma automatically handles both.
 #
 # ============================================================
-vector_db = Chroma(
-    # Directory where vectors are persisted
-    #
-    # Example:
-    #
-    # ./chroma_db
-    #
-    persist_directory=CHROMA_DIR,
-    # Embedding model used for:
-    #
-    # - Storing documents
-    # - Searching documents
-    #
-    # IMPORTANT:
-    #
-    # The same embedding model must be used
-    # for indexing and querying.
-    #
-    embedding_function=embeddings
-)
+_vector_db: Chroma | None = None
+
+
+def get_vector_db(*, create: bool = False) -> Chroma:
+    global _vector_db
+
+    if _vector_db is not None:
+        return _vector_db
+
+    persist_dir = Path(CHROMA_DIR)
+    if not create:
+        sqlite_path = persist_dir / "chroma.sqlite3"
+        if not persist_dir.exists() or not sqlite_path.exists():
+            raise RuntimeError(
+                "Vector store not initialized. Run POST /ingest or python -m scripts.ingest to load PDFs."
+            )
+
+    _vector_db = Chroma(
+        persist_directory=CHROMA_DIR,
+        embedding_function=embeddings,
+    )
+    return _vector_db

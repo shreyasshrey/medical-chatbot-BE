@@ -126,7 +126,7 @@ POST /chat ──► app/api/routes.py  (chat handler)
 ```bash
 # 1. Create and activate a virtual environment
 python -m venv venv
-source venv/bin/activate            # Windows: venv\Scripts\activate
+.\.venv\Scripts\activate.bat           # Windows: venv\Scripts\activate
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -142,6 +142,10 @@ python -m scripts.ingest data/pdfs/ANATOMY_PHYSIOLOGY.pdf # or specific file(s)/
 uvicorn app.main:app --reload                             # http://localhost:8000
 #    Swagger docs: http://localhost:8000/docs
 #    Health check: http://localhost:8000/health
+
+If it feels “stuck” (CPU high / no response) Run without reload (prevents the double-load and is much faster for ML models):
+
+uvicorn app.main:app
 ```
 
 ### Run with Docker (replaces steps 1–5)

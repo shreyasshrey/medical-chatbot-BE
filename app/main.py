@@ -33,6 +33,7 @@ async def lifespan(_: FastAPI):
     # Create all tables defined in SQLAlchemy models.
     # If tables already exist, this operation does nothing.
     Base.metadata.create_all(bind=engine)
+    # PDFs are not ingested automatically at startup; run POST /ingest or scripts/ingest.py to build the vector store.
     # Yield control back to FastAPI and keep application running
     yield
 

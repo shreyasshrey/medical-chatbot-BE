@@ -20,6 +20,8 @@ from app.services.rag import build_context
 # Streaming service used for token-by-token response generation
 from app.services.streaming import stream_response
 
+from scripts.ingest import ingest_pdfs
+
 # Create FastAPI router instance
 router = APIRouter()
 
@@ -73,6 +75,17 @@ def delete_chat_history(session_id: str):
     return {"session_id": session_id, "deleted": True}
 
 
+@router.post("/ingest")
+def ingest():
+    print("POST /ingest called", flush=True)
+    try:
+        result = ingest_pdfs()
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    print("POST /ingest completed", flush=True)
+    return result
+
+
 # ============================================================
 # MAIN CHAT ENDPOINT
 # ============================================================
@@ -97,10 +110,16 @@ def chat(request: ChatRequest):
     #     Previous conversation history
     #
     # --------------------------------------------------------
-    standalone_q, context, history = build_context(
-        question,
-        session_id,
-    )
+    try:
+        standalone_q, context, history = build_context(
+            question,
+            session_id,
+        )
+    except RuntimeError as e:
+        msg = str(e)
+        if "Vector store not initialized" in msg:
+            raise HTTPException(status_code=400, detail=msg)
+        raise
 
     # --------------------------------------------------------
     # Prompt for streaming mode

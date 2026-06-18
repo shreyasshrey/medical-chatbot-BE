@@ -39,7 +39,7 @@
 # Qdrant
 # Pinecone
 #
-from app.services.vector_store import vector_db
+from app.services.vector_store import get_vector_db
 
 
 # ============================================================
@@ -105,7 +105,7 @@ def semantic_search(query, k=5):
     # Return top-k matching documents.
     #
     # ========================================================
-    docs = vector_db.similarity_search(query, k=k)
+    docs = get_vector_db(create=False).similarity_search(query, k=k)
 
 
     # ========================================================
